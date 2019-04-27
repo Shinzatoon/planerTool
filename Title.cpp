@@ -10,7 +10,7 @@ Image back1;
 Image back2;
 Image back3;	//後で配列にしよう！！
 Dlist objList;
-
+//こんにちは！！
 
 bool checkin = false;
 
