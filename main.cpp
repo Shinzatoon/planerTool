@@ -93,6 +93,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {// ウィンドウプロシージャ
 	if (!initialized)
 	{
+		switch (iMsg)
+		{
+		case WM_CREATE:
+			DragAcceptFiles(hWnd, TRUE);
+			return 0;
+		}
 		return DefWindowProc(hWnd, iMsg, wParam, lParam);
 	}
 	HDC hdc;
@@ -109,9 +115,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		break;
-	case WM_CREATE:
-		DragAcceptFiles(hWnd, TRUE);
-		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
