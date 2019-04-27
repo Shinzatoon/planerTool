@@ -16,6 +16,7 @@ Timer gameTimer = Timer(1000000000);//ゲームタイマー
 Audio audio;
 bool initialized = false;
 
+TCHAR strFilePath[MAX_PATH];//ドラッグしたファイル名を保存するchar型変数
 
 LPDIRECT3D9 pD3D = nullptr;
 LPDIRECT3DDEVICE9 pDevice = nullptr;
@@ -94,6 +95,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	{
 		return DefWindowProc(hWnd, iMsg, wParam, lParam);
 	}
+	HDC hdc;
+	HDROP hDrop;//
+	UINT uiFileCount, uiLength;// ファイル数カウント、
+	TEXTMETRIC tm;//
 	switch (iMsg)
 	{
 	case WM_KEYDOWN:
@@ -104,9 +109,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		break;
+	case WM_CREATE:
+		DragAcceptFiles(hWnd, TRUE);
+		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+	case WM_DROPFILES:
+		// wParamからドラッグされたオブジェクトを取得する
+		hDrop = (HDROP)wParam;
+		// ドロップされたファイル数を取得する。
+		uiFileCount = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
+
+		hdc = GetDC(hWnd);
+		GetTextMetrics(hdc, &tm);
+		// ドロップされたファイルパスを取得する。
+		uiLength = DragQueryFile(hDrop, 0, strFilePath, MAX_PATH);
+
+		ReleaseDC(hWnd, hdc);
+		DragFinish(hDrop); // ドロップオブジェクトの終了処理
+		return 0;
+
 	case WM_CHAR:					// 文字が入力された
 		keyIn(wParam);
 		return 0;
