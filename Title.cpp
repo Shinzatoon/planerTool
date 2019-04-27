@@ -10,7 +10,7 @@ Image back1;
 Image back2;
 Image back3;	//Œã‚Å”z—ñ‚É‚µ‚æ‚¤II
 Dlist objList;
-
+//aiueo
 bool checkin = false;
 
 VECTOR2 cursorMoveAmount;//ˆÚ“®—Ê 
