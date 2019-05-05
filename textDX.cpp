@@ -69,7 +69,7 @@ int printTextDX(TextDX* text,const std::string &str, int x, int y, float value)
 	const int BUF_SIZE = 255;
 	static char buffer[BUF_SIZE];
 	// ˆø”float‚ğCstring‚É•ÏŠ·‚·‚é
-	_snprintf_s(buffer, BUF_SIZE, "%f", value);
+	_snprintf_s(buffer, BUF_SIZE, "%.2f", value);
 	return printTextDX(text,str + buffer, x, y);
 }
 int printTextDX(TextDX* text,const std::string &str, int x, int y, int value)

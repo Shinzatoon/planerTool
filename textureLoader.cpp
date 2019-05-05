@@ -1,6 +1,7 @@
 #include "TextureLoader.h"
 
-TextureLoader textureLoader;
+TextureLoader textureLoader;//インスタンス(実体)
+
 TextureLoader* getTextureLoader()
 {
 	return &textureLoader;
