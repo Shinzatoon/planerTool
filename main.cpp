@@ -3,6 +3,7 @@
 #include "game.h"
 #include "textDX.h"
 #include "Timer.h"
+#include "fileLoader.h"
 
 // グローバル変数
 HWND g_hWnd = NULL;
@@ -104,7 +105,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	HDC hdc;
 	HDROP hDrop;//
 	UINT uiFileCount, uiLength;// ファイル数カウント、
-	TEXTMETRIC tm;//
+	
 	switch (iMsg)
 	{
 	case WM_KEYDOWN:
@@ -125,9 +126,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		uiFileCount = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
 
 		hdc = GetDC(hWnd);
-		GetTextMetrics(hdc, &tm);
+		
 		// ドロップされたファイルパスを取得する。
 		uiLength = DragQueryFile(hDrop, 0, strFilePath, MAX_PATH);
+
+		getFileLoader()->load(strFilePath);
 
 		ReleaseDC(hWnd, hdc);
 		DragFinish(hDrop); // ドロップオブジェクトの終了処理
@@ -360,6 +363,7 @@ void printText()
 // 終了処理
 void unInitialize()
 {
+	getFileLoader()->release();
 	UninitInput();
 	unInitializeTextDX();
 	unInitializeGame();

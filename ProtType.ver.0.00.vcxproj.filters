@@ -43,6 +43,9 @@
     <Filter Include="ドメイン\メッセージダイアログ">
       <UniqueIdentifier>{07793791-7ab6-41de-87c8-c890aeb80160}</UniqueIdentifier>
     </Filter>
+    <Filter Include="アプリケーション\ファイルロード">
+      <UniqueIdentifier>{46433069-4b1b-436f-a0f9-2b228ac75d0e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -85,6 +88,9 @@
       <Filter>ドメイン\メッセージダイアログ</Filter>
     </ClCompile>
     <ClCompile Include="CircDblLinkedList.cpp" />
+    <ClCompile Include="fileLoader.cpp">
+      <Filter>アプリケーション\ファイルロード</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -127,5 +133,8 @@
       <Filter>ドメイン\メッセージダイアログ</Filter>
     </ClInclude>
     <ClInclude Include="CircDblLinkedList.h" />
+    <ClInclude Include="fileLoader.h">
+      <Filter>アプリケーション\ファイルロード</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

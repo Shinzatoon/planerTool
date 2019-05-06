@@ -4,13 +4,13 @@
 #include"textureLoader.h"
 #include"input.h"
 #include "CircDblLinkedList.h"
+#include "fileLoader.h"
 
 Image back;
 Image back1;
 Image back2;
 Image back3;	//後で配列にしよう！！
 Dlist objList;
-//aiueo
 bool checkin = false;
 
 VECTOR2 cursorMoveAmount;//移動量 
@@ -31,9 +31,10 @@ void initializeTitle() {
 	InitImage(&back3, getTexture(textureLoaderNS::STAR_ICON), 100, 480, 100, 100);
 	
 	Initialize(&objList);//リストの初期化
-
-	InsertAfter(&objList, objList.crnt, new Image());//新しいImage構造体を追加する 登録　new
-	InitImage(&objList.crnt->data, getTexture(textureLoaderNS::ENEMY_ICON), 100, 160, 100, 100);//現在さしているノードを初期化
+	Image i;//空の情報を[用意]
+	InitImage(&i, getTexture(textureLoaderNS::ENEMY_ICON), 100, 160, 100, 100);//[初期化]
+	InsertAfter(&objList, objList.crnt, &i);//新しいImage構造体を追加する [登録]　←new使ったらoutでした（メモリリークおこす）
+	//InitImage(&objList.crnt->data, getTexture(textureLoaderNS::ENEMY_ICON), 100, 160, 100, 100);//現在さしているノードを初期化
 	
 };
 void updateTitle() {
@@ -105,6 +106,26 @@ void printTitle() {
 	{
 		printTextDX(getDebugFont(), "挿入った", 500, 0);
 	}
+
+	if (getFileLoader()->initialized())
+	{
+		printTextDX(getDebugFont(), "id", 0, WINDOW_HEIGHT / 2 - 20);
+		printTextDX(getDebugFont(), ":objType", 100, WINDOW_HEIGHT / 2 -20);
+		printTextDX(getDebugFont(), ":x", 200, WINDOW_HEIGHT / 2 -20);
+		printTextDX(getDebugFont(), ":y", 300, WINDOW_HEIGHT / 2 -20);
+		printTextDX(getDebugFont(), ":rot", 400, WINDOW_HEIGHT / 2 -20);
+		int objNum = getFileLoader()->objNum();
+		Object* o = getFileLoader()->getObj();
+		for (int i = 0;i < objNum; i++)
+		{
+			printTextDX(getDebugFont(), "", 0, WINDOW_HEIGHT / 2 + (i * 20), o[i].id);
+			printTextDX(getDebugFont(), ":", 100, WINDOW_HEIGHT / 2 + (i * 20), o[i].objType);
+			printTextDX(getDebugFont(), ":", 200, WINDOW_HEIGHT / 2 + (i * 20), o[i].position.x);
+			printTextDX(getDebugFont(), ":", 300, WINDOW_HEIGHT / 2 + (i * 20), o[i].position.y);
+			printTextDX(getDebugFont(), ":", 400, WINDOW_HEIGHT / 2 + (i * 20), o[i].rotation);
+		}
+	}
+
 };
 bool oncursor(Image img)
 {
@@ -133,7 +154,7 @@ void moveControl(Image *img)
 				//そのアイコンをドラッグする
 				Target = img;
 
-				recordCursor = VECTOR2(getMouseX(), getMouseY());//クリックした瞬間のカーソル位置を保存
+				recordCursor = VECTOR2((float)getMouseX(), (float)getMouseY());//クリックした瞬間のカーソル位置を保存
 				recordIcon = (VECTOR2)Target->position;//クリックした瞬間のアイコン位置を保存
 				onDrag = true;//ドラッグ状態にする
 			}
@@ -176,4 +197,7 @@ void moveControl(Image *img)
 //	return 0;
 //}
 
-void unInitializeTitle() {};
+void unInitializeTitle() 
+{
+	Terminate(&objList);
+};
