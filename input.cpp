@@ -60,8 +60,11 @@ int mouseX, mouseY;								// マウスの画面座標
 RAWINPUTDEVICE Rid[1];							// 高精細マウス用
 bool mouseCaptured;								// マウスがキャプチャされた場合はtrue
 bool mouseLButton;								// マウスの左ボタンが押されている場合はtrue
+bool recordMLB;									// マウスの左ボタンの1フレーム前の状態
 bool mouseMButton;								// 中マウスボタンが押されている場合はtrue
+bool recordMMB;									// マウスの中ボタンの1フレーム前の状態
 bool mouseRButton;								// マウスの右ボタンが押されている場合はtrue
+bool recordMRB;									// マウスの右ボタンの1フレーム前の状態
 bool mouseX1Button;								// X1のマウスボタンが押されている場合はtrue
 bool mouseX2Button;								// X2のマウスボタンが押されている場合はtrue
 
@@ -327,6 +330,10 @@ HRESULT InitializeMouse(HINSTANCE hInst, HWND hWindow,bool capture)
 	mouseX1Button = false;	// X1マウスボタンが押されている場合にtrue
 	mouseX2Button = false;	// X2マウスボタンが押されている場合にtrue
 
+	recordMLB = false;
+	recordMMB = false;
+	recordMRB = false;
+
 	mouseCaptured = capture;
 
 	// 高精細マウスを登録
@@ -393,18 +400,28 @@ void mouseClear(UCHAR what)
 
 //---------------------------- mouse
 // マウスボタンの状態を保存
-void setMouseLButton(bool b) { mouseLButton = b; }
+void setMouseLButton(bool b) { 
+	mouseLButton = b; }
 
 // マウスボタンの状態を保存
-void setMouseMButton(bool b) { mouseMButton = b; }
+void setMouseMButton(bool b) {
+	mouseMButton = b; }
 
 // マウスボタンの状態を保存
-void setMouseRButton(bool b) { mouseRButton = b; }
+void setMouseRButton(bool b) {
+	mouseRButton = b; }
 
 // マウスボタンの状態を保存
 void setMouseXButton(WPARAM wParam) {
 	mouseX1Button = (wParam & MK_XBUTTON1) ? true : false;
 	mouseX2Button = (wParam & MK_XBUTTON2) ? true : false;
+}
+
+void recordMouseButton()
+{
+	recordMLB = mouseLButton;//直前の状態を保存する
+	recordMMB = mouseMButton;//直前の状態を保存する
+	recordMRB = mouseRButton;//直前の状態を保存する
 }
 
 // マウスのX位置を戻す
@@ -423,12 +440,24 @@ int getMouseRawY() { return mouseRawY; }
 
 // 左マウスボタンの状態を戻す
 bool getMouseLButton() { return mouseLButton; }
+// 左マウスボタンを押した瞬間
+bool getMouseLTrigger() {return getMouseLButton() == true && recordMLB == false ? true : false;}
+// 左マウスボタンを離した瞬間
+bool getMouseLRelease() { return getMouseLButton() == false && recordMLB == true ? true : false; }
 
 // 中央マウスボタンの状態を戻す
 bool getMouseMButton() { return mouseMButton; }
+// 中央マウスボタンを押した瞬間
+bool getMouseMTrrigered() { return getMouseMButton() == true && recordMMB == false ? true : false; }
+// 中央マウスボタンを離した瞬間
+bool getMouseMRelase() { return getMouseMButton() == false && recordMMB == true ? true : false; }
 
 // 右マウスボタンの状態を戻す
 bool getMouseRButton() { return mouseRButton; }
+// 右マウスボタンを押した瞬間
+bool getMouseRTrrigered() { return getMouseRButton() == true && recordMRB == false ? true : false; }
+// 右マウスボタンを離した瞬間
+bool getMouseRRelase() { return getMouseRButton() == false && recordMRB == true ? true : false; }
 
 // X1マウスボタンの状態を戻す
 bool getMouseX1Button() { return mouseX1Button; }

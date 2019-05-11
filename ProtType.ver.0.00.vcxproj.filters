@@ -46,6 +46,12 @@
     <Filter Include="アプリケーション\ファイルロード">
       <UniqueIdentifier>{46433069-4b1b-436f-a0f9-2b228ac75d0e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="アプリケーション\エクスポーター">
+      <UniqueIdentifier>{c19f1868-3bc0-4d12-90d4-9b6303ca1f02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="アプリケーション\カーソル">
+      <UniqueIdentifier>{5a179898-932e-4b89-a540-f55c7ed834f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -87,9 +93,18 @@
     <ClCompile Include="messageDialog.cpp">
       <Filter>ドメイン\メッセージダイアログ</Filter>
     </ClCompile>
-    <ClCompile Include="CircDblLinkedList.cpp" />
     <ClCompile Include="fileLoader.cpp">
       <Filter>アプリケーション\ファイルロード</Filter>
+    </ClCompile>
+    <ClCompile Include="exporter.cpp">
+      <Filter>アプリケーション\エクスポーター</Filter>
+    </ClCompile>
+    <ClCompile Include="icon.cpp">
+      <Filter>アプリケーション\オブジェクト</Filter>
+    </ClCompile>
+    <ClCompile Include="DataList.cpp" />
+    <ClCompile Include="cursor.cpp">
+      <Filter>アプリケーション\カーソル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -132,9 +147,18 @@
     <ClInclude Include="messageDialog.h">
       <Filter>ドメイン\メッセージダイアログ</Filter>
     </ClInclude>
-    <ClInclude Include="CircDblLinkedList.h" />
     <ClInclude Include="fileLoader.h">
       <Filter>アプリケーション\ファイルロード</Filter>
+    </ClInclude>
+    <ClInclude Include="exporter.h">
+      <Filter>アプリケーション\エクスポーター</Filter>
+    </ClInclude>
+    <ClInclude Include="icon.h">
+      <Filter>アプリケーション\オブジェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="DataList.h" />
+    <ClInclude Include="cursor.h">
+      <Filter>アプリケーション\カーソル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

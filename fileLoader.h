@@ -4,9 +4,6 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 
-//#include <WindowsX.h>
-//#include <crtdbg.h>
-
 enum OBJ_TYPE
 {
 	T_PLAYER,

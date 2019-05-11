@@ -124,9 +124,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="audio.cpp" />
-    <ClCompile Include="CircDblLinkedList.cpp" />
+    <ClCompile Include="cursor.cpp" />
+    <ClCompile Include="DataList.cpp" />
+    <ClCompile Include="exporter.cpp" />
     <ClCompile Include="fileLoader.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="icon.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="inputDialog.cpp" />
@@ -141,9 +144,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="audio.h" />
-    <ClInclude Include="CircDblLinkedList.h" />
+    <ClInclude Include="cursor.h" />
+    <ClInclude Include="DataList.h" />
+    <ClInclude Include="exporter.h" />
     <ClInclude Include="fileLoader.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="icon.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="inputDialog.h" />

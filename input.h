@@ -88,6 +88,8 @@ void setMouseMButton(bool b);
 void setMouseRButton(bool b);
 // マウスボタンの状態を保存
 void setMouseXButton(WPARAM wParam);
+// 直前のマウスボタンの状態を保存
+void recordMouseButton();
 // マウスのX位置を戻す
 int getMouseX();
 // マウスのY位置を戻す
@@ -100,6 +102,11 @@ int getMouseRawX();
 int getMouseRawY();
 // 左マウスボタンの状態を戻す
 bool getMouseLButton();
+// 左マウスボタンの押した瞬間
+bool getMouseLTrigger();
+// 左マウスボタンの離した瞬間
+bool getMouseLRelease();
+
 // 中央マウスボタンの状態を戻す
 bool getMouseMButton();
 // 右マウスボタンの状態を戻す
