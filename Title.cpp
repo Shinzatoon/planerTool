@@ -42,34 +42,7 @@ void updateTitle() {
 	moveControl(&back1);
 
 	moveControl(&back2);
-	//if (getMouseLButton())
-	//{//左クリックが押されているとき
-	//	if (oncursor(back1)) 
-	//	{//カーソルがアイコン上にあるとき
-	//		if (!onDrag)
-	//		{//何かをドラッグしていなければ
-	//			//そのアイコンをドラッグする
-	//			recordCursor = VECTOR2(getMouseX(), getMouseY());//クリックした瞬間のカーソル位置を保存
-	//			recordIcon = (VECTOR2)back1.position;//クリックした瞬間のアイコン位置を保存
-	//			onDrag = true;//ドラッグ状態にする
-	//		}
-	//	}
-	//	//setPosition(&back1, back1.position.x += (float)getMouseRawX(), back1.position.y += (float)getMouseRawY());
-	//	//setPosition(&back1, (float)getMouseRawX(), (float)getMouseRawY());
-	//}
-	//else if (onDrag)
-	//{//左クリックが離されていて、ドラッグ状態であったならば
-	//	onDrag = false;//ドラッグ状態をOFFにする
-	//}
-
-	//if (onDrag)
-	//{//ドラッグ状態のとき移動
-	//	cursorMoveAmount = VECTOR2(getMouseX(), getMouseY()) - recordCursor;//カーソル移動量
-	//	VECTOR2 virtualPos = recordIcon + cursorMoveAmount;//仮の表示位置
-	//	setPosition(&back1, virtualPos.x, virtualPos.y);
-	//}
 	
-
 	
 
 
@@ -88,6 +61,23 @@ void printTitle() {
 	printTextDX(getDebugFont(), "Title", 0, 0);
 	printTextDX(getDebugFont(), "mouseX:", 1000, 0, getMouseX());
 	printTextDX(getDebugFont(), "mouseY:", 1000, 20, getMouseY());
+
+
+	//プロパティの表示
+	if (getMouseLButton())
+	{
+		if (oncursor(back2))
+		{
+				printTextDX(getDebugFont(), "■ プレイヤー", 1230, 60);
+				printTextDX(getDebugFont(), "高さ:", 1300, 80, back2.height);
+				printTextDX(getDebugFont(), "幅　:", 1300, 100, back2.width);
+			if (!onDrag)
+			{
+			}
+		}
+	}
+
+
 	if (getMouseLButton())
 	{
 		printTextDX(getDebugFont(), "mouseX:", 500, 0, getMouseRawX());
@@ -139,6 +129,19 @@ bool oncursor(Image img)
 		return false;
 	}
 }
+bool on(Image img)
+{
+	if (img.position.x < getMouseX() && img.position.x + img.height > getMouseX() &&
+		img.position.y < getMouseY() && img.position.y + img.width > getMouseY())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 
 Image a[1];
 Image *Target;
@@ -175,6 +178,43 @@ void moveControl(Image *img)
 		setPosition(Target, virtualPos.x, virtualPos.y);
 	}
 }
+
+/*ゲーム画面の移動
+void movePointofView(Image *img)
+{
+	if (getMouseLButton())
+	{//左クリックが押されているとき
+		if (!oncursor(*img)&&!)
+		{//カーソルがアイコン上にあるとき
+			if (!onDrag)
+			{//何かをドラッグしていなければ
+				//そのアイコンをドラッグする
+				Target = img;
+
+				recordCursor = VECTOR2((float)getMouseX(), (float)getMouseY());//クリックした瞬間のカーソル位置を保存
+				recordIcon = (VECTOR2)Target->position;//クリックした瞬間のアイコン位置を保存
+				onDrag = true;//ドラッグ状態にする
+			}
+		}
+		//setPosition(&back1, back1.position.x += (float)getMouseRawX(), back1.position.y += (float)getMouseRawY());
+		//setPosition(&back1, (float)getMouseRawX(), (float)getMouseRawY());
+	}
+	else if (onDrag)
+	{//左クリックが離されていて、ドラッグ状態であったならば
+		onDrag = false;//ドラッグ状態をOFFにする
+		Target = NULL;
+	}
+
+	if (onDrag && Target != NULL)
+	{//ドラッグ状態のとき移動
+		cursorMoveAmount = VECTOR2(getMouseX(), getMouseY()) - recordCursor;//カーソル移動量
+		VECTOR2 virtualPos = recordIcon + cursorMoveAmount;//仮の表示位置
+		setPosition(Target, virtualPos.x, virtualPos.y);
+	}
+}
+
+*/
+
 
 ////mallocサンプル
 //int main()
