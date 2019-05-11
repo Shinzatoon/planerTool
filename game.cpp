@@ -20,7 +20,7 @@ void updateGame() {
 	changeScene();
 	switch (scene)
 	{
-	case TITLE:		updateTitle();		break;
+	case TITLE:		updateTitle();	break;
 	case STAGE:		updateStage();	break;
 	case RESULT:		updateResult();	break;
 	default:	break;

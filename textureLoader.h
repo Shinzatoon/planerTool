@@ -9,6 +9,8 @@ namespace textureLoaderNS
 		ENEMY_ICON,
 		PLAYER_ICON,
 		STAR_ICON,
+		EXPORT_ICON,
+		BUTTON_FRAME,
 		MAX_TEXTURE,
 	};
 }

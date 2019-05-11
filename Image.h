@@ -43,7 +43,6 @@ void InitAnimeImage(Image* image, LPDIRECT3DTEXTURE9* texture,
 	float x, float y, float width, float height,
 	int time, int pattern, int divide_u, int divide_v);
 
-
 void UninitImage(Image* image);
 void DrawImage(Image* image);
 
@@ -59,4 +58,3 @@ void setSize(Image* image, float _width, float _height);
 // Image‚ÌƒJƒ‰[‚ğ•ÏX‚·‚é
 void SetColorImage(Image* image, D3DXCOLOR color);
 HRESULT MakeVertex(Image* image, LPDIRECT3DDEVICE9 pDevice);
-

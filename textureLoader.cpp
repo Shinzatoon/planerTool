@@ -17,6 +17,8 @@ TextureLoader::TextureLoader()
 	textureName[textureLoaderNS::ENEMY_ICON] = { "TEXTURE/enemyIcon.png" };
 	textureName[textureLoaderNS::PLAYER_ICON] = { "TEXTURE/playerIcon.png" };
 	textureName[textureLoaderNS::STAR_ICON] = { "TEXTURE/starIcon.png" };
+	textureName[textureLoaderNS::EXPORT_ICON] = { "TEXTURE/exportButton.png" };
+	textureName[textureLoaderNS::BUTTON_FRAME] = { "TEXTURE/buttonFrame.png" };
 }
 
 
