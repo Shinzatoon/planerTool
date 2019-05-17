@@ -40,7 +40,6 @@ void initializeTitle() {
 
 	objList.Initialize();//リストの初期化
 
-
 	exportButton.initialize(EXPORT_ICON);
 };
 
@@ -48,29 +47,29 @@ void updateTitle() {
 
 	cursor.update();//カーソルの更新
 
-	moveControl(&back1);
-	moveControl(&back2);
-	
-	//playerIcon.update();
 	exportButton.update();
 	
 	bool onCreateIcon = false;
-	Icon i;
+	Icon obj;//新たに作成するオブジェクトの初期化用
 	if (getMouseLTrigger())
-	{
+	{// 左クリックされた時
 		if (playerIcon.onCursor(cursor.position))
-		{
-			i.initialize(PLAYER_ICON,VECTOR2((float)getMouseX(), (float)getMouseY()));
-			objList.InsertAfter(objList.crnt, &i);
+		{// カーソルがプレイヤーアイコン上にあった場合
+			obj.initialize(PLAYER_ICON,playerIcon.getPos());//新たに作成するオブジェクトの初期化
+			objList.InsertAfter(objList.crnt, &obj);//オブジェクトの生成(リストへ登録)
 			onCreateIcon = true;
+			cursor.setTarget(&objList.crnt->data);//カーソルの選択対象としてセットする。
 		}
+		
+		//リストの全走査
+
+
 	}
 
-	//アイコンにカーソルを合わせる
-	//ホールド状態でなければ、
-	//アイコンの上でつかむ（クリック）→オブジェクト一つ生成
-	//ホールド状態にする
-	//
+
+	//選択対象オブジェクトがあればドラッグを行う。
+	cursor.drag();
+
 };
 
 void drawTitle() {
@@ -99,9 +98,9 @@ void printTitle() {
 	{
 		if (oncursor(back2))
 		{
-				printTextDX(getDebugFont(), "■ プレイヤー", 1230, 60);
-				printTextDX(getDebugFont(), "高さ:", 1300, 80, back2.height);
-				printTextDX(getDebugFont(), "幅　:", 1300, 100, back2.width);
+			printTextDX(getDebugFont(), "■ プレイヤー", 1230, 60);
+			printTextDX(getDebugFont(), "高さ:", 1300, 80, back2.height);
+			printTextDX(getDebugFont(), "幅　:", 1300, 100, back2.width);
 			if (!onDrag)
 			{
 			}
@@ -193,8 +192,6 @@ void moveControl(Image *img)
 				onDrag = true;//ドラッグ状態にする
 			}
 		}
-		//setPosition(&back1, back1.position.x += (float)getMouseRawX(), back1.position.y += (float)getMouseRawY());
-		//setPosition(&back1, (float)getMouseRawX(), (float)getMouseRawY());
 	}
 	else if (onDrag)
 	{//左クリックが離されていて、ドラッグ状態であったならば
@@ -210,64 +207,6 @@ void moveControl(Image *img)
 	}
 
 }
-
-/*ゲーム画面の移動
-void movePointofView(Image *img)
-{
-	if (getMouseLButton())
-	{//左クリックが押されているとき
-		if (!oncursor(*img)&&!)
-		{//カーソルがアイコン上にあるとき
-			if (!onDrag)
-			{//何かをドラッグしていなければ
-				//そのアイコンをドラッグする
-				Target = img;
-
-				recordCursor = VECTOR2((float)getMouseX(), (float)getMouseY());//クリックした瞬間のカーソル位置を保存
-				recordIcon = (VECTOR2)Target->position;//クリックした瞬間のアイコン位置を保存
-				onDrag = true;//ドラッグ状態にする
-			}
-		}
-		//setPosition(&back1, back1.position.x += (float)getMouseRawX(), back1.position.y += (float)getMouseRawY());
-		//setPosition(&back1, (float)getMouseRawX(), (float)getMouseRawY());
-	}
-	else if (onDrag)
-	{//左クリックが離されていて、ドラッグ状態であったならば
-		onDrag = false;//ドラッグ状態をOFFにする
-		Target = NULL;
-	}
-
-	if (onDrag && Target != NULL)
-	{//ドラッグ状態のとき移動
-		cursorMoveAmount = VECTOR2(getMouseX(), getMouseY()) - recordCursor;//カーソル移動量
-		VECTOR2 virtualPos = recordIcon + cursorMoveAmount;//仮の表示位置
-		setPosition(Target, virtualPos.x, virtualPos.y);
-	}
-}
-
-*/
-
-
-////mallocサンプル
-//int main()
-//{
-//	int i;
-//	int *heep;
-//	heep = (int*)malloc(sizeof(int) * 10);
-//
-//	if (heep == NULL)
-//		exit(0);
-//
-//	for (i = 0; i < 10; i++)
-//	{
-//		heep[i] = i;
-//	}
-//	printf("%d\n", heep[5]);
-//
-//	free(heep);
-//
-//	return 0;
-//}
 
 void unInitializeTitle() 
 {

@@ -13,11 +13,14 @@ public:
 	VECTOR2 recordPos;
 	VECTOR2 recordIconPos;
 	VECTOR2 moveAmount;
+	Icon* target;
 
 
 	Cursor();
 
 	void update();
 
-	void drag(Icon* icon);
+	void drag();
+	
+	void setTarget(Icon* icon);
 };

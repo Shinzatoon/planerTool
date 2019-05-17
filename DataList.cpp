@@ -69,7 +69,8 @@ void Dlist::Print()
 	if (IsEmpty()){
 		//puts("ノードがありません。");
 	} else {
-		Dnode* ptr = head->next;
+		//全オブジェクトの走査
+		Dnode* ptr = head->next;//ポインタを先頭ヘッダに合わせる。
 		while (ptr != head) {
 			ptr->data.draw();	//実行したいこと
 			ptr = ptr->next;	// 後続ノードに着目	
