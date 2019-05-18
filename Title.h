@@ -8,4 +8,3 @@ void updateTitle();
 void drawTitle();
 void printTitle();
 void unInitializeTitle();
-void moveControl(Image *img);

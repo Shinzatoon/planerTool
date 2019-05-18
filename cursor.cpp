@@ -6,6 +6,7 @@ Cursor::Cursor()
 {
 	onDrag = false;
 	target = NULL;
+	onCreateIcon = false;
 	position.x = (float)getMouseX();
 	position.y = (float)getMouseY();
 
@@ -23,12 +24,23 @@ void Cursor::setTarget(Icon* icon)
 	target = icon;//ドラッグ対象をセットする。
 }
 
+void Cursor::selectTarget(Icon* icon)
+{
+	if (getMouseLTrigger())
+	{//左クリックが押されたとき
+		if (icon->onCursor())
+		{//カーソルがアイコン上にあるとき
+			setTarget(icon);
+		}
+	}
+}
+
 void Cursor::drag()
 {
 	if (target == NULL)return;//選択対象がなければリターン
 	if (getMouseLButton())
 	{//左クリックが押されているとき
-		if (target->onCursor(position))
+		if (target->onCursor())
 		{//カーソルがアイコン上にあるとき
 			if (!onDrag)
 			{//何かをドラッグしていなければ

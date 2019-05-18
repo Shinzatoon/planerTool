@@ -63,6 +63,24 @@ Dnode* Dlist::Search(const Icon* x, int compare(const Icon* x, const Icon* y))
 	return NULL;				// 探索失敗
 };
 
+// 全ノードのデータをリスト順に更新
+void Dlist::update()
+{
+	if (IsEmpty()) {
+		//何の処理も行いません。
+		//puts("ノードがありません。");
+	}
+	else {
+		//全オブジェクトの走査
+		Dnode* ptr = head->next;//ポインタを先頭ヘッダに合わせる。
+		while (ptr != head) {
+			ptr->data.update();	//更新処理
+			ptr = ptr->next;	// 後続ノードに着目	
+		}
+	}
+};
+
+
 // 全ノードのデータをリスト順に表示
 void Dlist::Print()
 {

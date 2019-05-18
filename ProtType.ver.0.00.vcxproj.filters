@@ -52,6 +52,9 @@
     <Filter Include="アプリケーション\カーソル">
       <UniqueIdentifier>{5a179898-932e-4b89-a540-f55c7ed834f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="アプリケーション\データリスト">
+      <UniqueIdentifier>{51604d5f-abbf-4b2f-a549-2c87228efcf5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -102,9 +105,11 @@
     <ClCompile Include="icon.cpp">
       <Filter>アプリケーション\オブジェクト</Filter>
     </ClCompile>
-    <ClCompile Include="DataList.cpp" />
     <ClCompile Include="cursor.cpp">
       <Filter>アプリケーション\カーソル</Filter>
+    </ClCompile>
+    <ClCompile Include="DataList.cpp">
+      <Filter>アプリケーション\データリスト</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -156,9 +161,11 @@
     <ClInclude Include="icon.h">
       <Filter>アプリケーション\オブジェクト</Filter>
     </ClInclude>
-    <ClInclude Include="DataList.h" />
     <ClInclude Include="cursor.h">
       <Filter>アプリケーション\カーソル</Filter>
+    </ClInclude>
+    <ClInclude Include="DataList.h">
+      <Filter>アプリケーション\データリスト</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

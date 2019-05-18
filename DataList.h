@@ -33,6 +33,9 @@ public:
 	// 関数compareによってxと一致すると判定されるノードを探索
 	Dnode* Search(const Icon* x, int compare(const Icon* x, const Icon* y));
 
+	// 全ノードのデータをリスト順に更新
+	void update();
+
 	// 全ノードのデータをリスト順に表示
 	void Print();
 

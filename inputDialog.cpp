@@ -130,7 +130,7 @@ void InputDialog::print(const std::string &str)
 	}
 	text = str + "\n\n\n\n\n";   // ボタン用に空間を空ける
 
-								 // textRectをダイアログのテキスト領域として設定
+	// textRectをダイアログのテキスト領域として設定
 	textRect.left = (long)(x + messageDialogNS::MARGIN);
 	textRect.right = (long)(x + messageDialogNS::WIDTH - messageDialogNS::MARGIN);
 	textRect.top = (long)(y + messageDialogNS::MARGIN);

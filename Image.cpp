@@ -4,7 +4,7 @@ void InitImage(Image* image, LPDIRECT3DTEXTURE9* texture,
 	float x, float y, float width, float height)
 {
 	LPDIRECT3DDEVICE9 pDevice = getDevice();
-	image->g_pD3DTexture = *texture;
+	if(texture != NULL)image->pD3DTexture = *texture;
 	image->position = D3DXVECTOR3(x, y, 0.0f);
 	image->width = width;
 	image->height = height;
@@ -22,6 +22,13 @@ void InitImage(Image* image, LPDIRECT3DTEXTURE9* texture,
 	image->renderFlag = true;
 	// 頂点情報の作成
 	MakeVertex(image, pDevice);
+}
+void InitImage(Image* image, LPDIRECT3DTEXTURE9* texture,
+	float x, float y, float width, float height, D3DXCOLOR color)
+{
+	LPDIRECT3DDEVICE9 pDevice = getDevice();
+	InitImage(image, texture, x, y, width, height);//標準初期化
+	SetColorImage(image, color);
 }
 
 void InitAnimeImage(Image* image, LPDIRECT3DTEXTURE9* texture,
@@ -41,15 +48,25 @@ void InitAnimeImage(Image* image, LPDIRECT3DTEXTURE9* texture,
 
 void UninitImage(Image* image)
 {
-	if (image->g_pD3DTexture != NULL)
+	if (image->pD3DTexture != NULL)
 	{// テクスチャの開放
-		image->g_pD3DTexture->Release();
-		image->g_pD3DTexture = NULL;
+		//image->pD3DTexture->Release();
+		//image->pD3DTexture = NULL;
 	}
-	if (image->g_pD3DVtxBuffer != NULL)
-	{// テクスチャの開放
-		image->g_pD3DVtxBuffer->Release();
-		image->g_pD3DVtxBuffer = NULL;
+	if (image->pD3DVtxBuffer != NULL)
+	{// バッファーの開放
+		//image->pD3DVtxBuffer->Release();
+		//image->pD3DVtxBuffer = NULL;
+	}
+
+	if (image->textureArray != NULL)
+	{// テクスチャ配列の解放
+		for (int i = 0; i < image->listNum; i++)
+		{
+			//image->textureArray[i]->Release();
+			//image->textureArray[i] = NULL;
+		}
+		delete[] image->textureArray;
 	}
 }
 
@@ -74,18 +91,42 @@ void DrawImage(Image* image)
 	pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
 	// 頂点バッファをデバイスのデータストリームにバインド
-	pDevice->SetStreamSource(0, image->g_pD3DVtxBuffer, 0, sizeof(VERTEX_2D));
+	pDevice->SetStreamSource(0, image->pD3DVtxBuffer, 0, sizeof(VERTEX_2D));
 
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
 	// テクスチャの設定
-	pDevice->SetTexture(0, image->g_pD3DTexture);
+	pDevice->SetTexture(0, image->pD3DTexture);
 
 	// ポリゴンの描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
 }
 
+// Imageのテクスチャリストをセットする
+void setTextureList(Image* image, int arg_num, LPDIRECT3DTEXTURE9 texture, ...)
+{
+	va_list args;
+	
+	if (arg_num < 1) return;
+	image->listNum = arg_num;
+	image->textureArray = new LPDIRECT3DTEXTURE9[arg_num];
+
+	va_start(args, arg_num);
+
+	for (int i = 0; i < arg_num; i++) {
+		image->textureArray[i] = va_arg(args, LPDIRECT3DTEXTURE9);
+	}
+
+	va_end(args);
+}
+
+
+void changeTexture(Image* image, int listNo)
+{
+	if (image->listNum <= 0)return;
+	image->pD3DTexture = image->textureArray[listNo];//テクスチャ配列の指定された番号に切り替える。
+}
 
 void setSize(Image* image, float _width, float _height) {
 	image->width = _width;
@@ -99,7 +140,7 @@ void setSize(Image* image, float _width, float _height) {
 		VERTEX_2D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		image->g_pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
+		image->pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
 
 		// 頂点座標の設定
 		pVtx[0].vtx = D3DXVECTOR3(x, y, 0.0f);
@@ -108,7 +149,7 @@ void setSize(Image* image, float _width, float _height) {
 		pVtx[3].vtx = D3DXVECTOR3(x + width, y + height, 0.0f);
 
 		// 頂点データをアンロックする
-		image->g_pD3DVtxBuffer->Unlock();
+		image->pD3DVtxBuffer->Unlock();
 	}
 };
 
@@ -124,7 +165,7 @@ void setPosition(Image* image, float _x, float _y)
 		VERTEX_2D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		image->g_pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
+		image->pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
 
 		// 頂点座標の設定
 		pVtx[0].vtx = D3DXVECTOR3(x, y, 0.0f);
@@ -133,9 +174,44 @@ void setPosition(Image* image, float _x, float _y)
 		pVtx[3].vtx = D3DXVECTOR3(x + width, y + height, 0.0f);
 
 		// 頂点データをアンロックする
-		image->g_pD3DVtxBuffer->Unlock();
+		image->pD3DVtxBuffer->Unlock();
 	}
 };
+
+void setAngle(Image* image, float _angle)
+{
+	image->angle = _angle;
+	float x = image->position.x;
+	float y = image->position.y;
+	float angle = image->angle;
+	float width = image->width;
+	float height = image->height;
+
+	//x = x * cosθ - y * sinθ
+	//y = x * sinθ + y * cosθ
+	float radian = D3DXToRadian(_angle);
+
+	{//頂点バッファの中身を埋める
+		VERTEX_2D *pVtx;
+
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		image->pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
+
+		// 頂点座標の設定
+		pVtx[0].vtx.x = x * cosf(radian) - y * sinf(radian);
+		pVtx[0].vtx.y = x * sinf(radian) + y * cosf(radian);
+		pVtx[1].vtx.x = (x + width) * cosf(radian) - y * sinf(radian);
+		pVtx[1].vtx.y = (x + width) * sinf(radian) + y * cosf(radian);
+		pVtx[2].vtx.x = x * cosf(radian) - (y + height) * sinf(radian);
+		pVtx[2].vtx.y = x * sinf(radian) + (y + height) * cosf(radian);
+		pVtx[3].vtx.x = (x + width) * cosf(radian) - (y + height) * sinf(radian);
+		pVtx[3].vtx.y = (x + width) * sinf(radian) + (y + height) * cosf(radian);
+
+		// 頂点データをアンロックする
+		image->pD3DVtxBuffer->Unlock();
+	}
+};
+
 
 // Imageのカラーを変更する
 void SetColorImage(Image* image, D3DXCOLOR color)
@@ -149,7 +225,7 @@ void SetColorImage(Image* image, D3DXCOLOR color)
 		VERTEX_2D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		image->g_pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
+		image->pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
 
 		// 反射光の設定
 		pVtx[0].diffuse = image->color[0];
@@ -158,7 +234,7 @@ void SetColorImage(Image* image, D3DXCOLOR color)
 		pVtx[3].diffuse = image->color[3];
 
 		// 頂点データをアンロックする
-		image->g_pD3DVtxBuffer->Unlock();
+		image->pD3DVtxBuffer->Unlock();
 	}
 
 }
@@ -177,7 +253,7 @@ void SetTexture(Image* image)
 		VERTEX_2D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		image->g_pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
+		image->pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
 
 		// テクスチャ座標の設定
 		pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
@@ -186,7 +262,7 @@ void SetTexture(Image* image)
 		pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
 
 		// 頂点データをアンロックする
-		image->g_pD3DVtxBuffer->Unlock();
+		image->pD3DVtxBuffer->Unlock();
 	}
 }
 
@@ -202,7 +278,7 @@ void SetTexture(Image* image, float ratioU, float ratioV)
 		VERTEX_2D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		image->g_pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
+		image->pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
 
 		// テクスチャ座標の設定
 		pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
@@ -211,7 +287,7 @@ void SetTexture(Image* image, float ratioU, float ratioV)
 		pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
 
 		// 頂点データをアンロックする
-		image->g_pD3DVtxBuffer->Unlock();
+		image->pD3DVtxBuffer->Unlock();
 	}
 }
 
@@ -222,7 +298,7 @@ HRESULT MakeVertex(Image* image, LPDIRECT3DDEVICE9 pDevice)
 		D3DUSAGE_WRITEONLY,			// 頂点バッファの使用法　
 		FVF_VERTEX_2D,				// 使用する頂点フォーマット
 		D3DPOOL_MANAGED,			// リソースのバッファを保持するメモリクラスを指定
-		&image->g_pD3DVtxBuffer,		// 頂点バッファインターフェースへのポインタ
+		&image->pD3DVtxBuffer,		// 頂点バッファインターフェースへのポインタ
 		NULL)))						// NULLに設定
 	{
 		return E_FAIL;
@@ -232,7 +308,7 @@ HRESULT MakeVertex(Image* image, LPDIRECT3DDEVICE9 pDevice)
 		VERTEX_2D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		image->g_pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
+		image->pD3DVtxBuffer->Lock(0, 0, (void**)&pVtx, 0);
 
 		float x = image->position.x;
 		float y = image->position.y;
@@ -265,7 +341,7 @@ HRESULT MakeVertex(Image* image, LPDIRECT3DDEVICE9 pDevice)
 		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 		// 頂点データをアンロックする
-		image->g_pD3DVtxBuffer->Unlock();
+		image->pD3DVtxBuffer->Unlock();
 	}
 
 	return S_OK;

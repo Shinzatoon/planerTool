@@ -13,7 +13,7 @@ LPDIRECT3DTEXTURE9* getTexture(int i)
 
 TextureLoader::TextureLoader()
 {
-	textureName[textureLoaderNS::BACK_GROUND] = { "TEXTURE/backGround2.jpg" };
+	textureName[textureLoaderNS::BACK_GROUND] = { "TEXTURE/backGround.png" };
 	textureName[textureLoaderNS::ENEMY_ICON] = { "TEXTURE/enemyIcon.png" };
 	textureName[textureLoaderNS::PLAYER_ICON] = { "TEXTURE/playerIcon.png" };
 	textureName[textureLoaderNS::STAR_ICON] = { "TEXTURE/starIcon.png" };

@@ -4,8 +4,8 @@ FileLoader fileLoader;
 
 FileLoader::FileLoader()
 {
-	m_objNum = 0;
-	m_initialized = false;
+	_objNum = 0;
+	_initialized = false;
 }
 
 void FileLoader::load(LPSTR fileName)
@@ -15,7 +15,7 @@ void FileLoader::load(LPSTR fileName)
 
 	char key[255] = { 0 };
 
-	if (m_initialized)
+	if (_initialized)
 	{
 		delete[] obj;
 	}
@@ -27,9 +27,9 @@ void FileLoader::load(LPSTR fileName)
 		//オブジェクト数を読み込む
 		if (strcmp(key, "objnum") == 0)
 		{
-			m_objNum;
-			fscanf_s(fp, "%d", &m_objNum);
-			obj = new Object[m_objNum];//オブジェクトを用意する。
+			_objNum;
+			fscanf_s(fp, "%d", &_objNum);
+			obj = new Object[_objNum];//オブジェクトを用意する。
 		}
 	}
 
@@ -49,7 +49,8 @@ void FileLoader::load(LPSTR fileName)
 		}
 	}
 	fclose(fp);
-	m_initialized = true;
+	_initialized = true;
+	_untreated = true;
 }
 
 void FileLoader::release()

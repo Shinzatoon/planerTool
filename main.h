@@ -54,8 +54,8 @@ struct VertexC				// 頂点カラー
 	unsigned long color;	// 頂点カラー
 };
 
-#define WINDOW_WIDTH 16*90
-#define WINDOW_HEIGHT 9*90
+#define WINDOW_WIDTH 16*90 //1440
+#define WINDOW_HEIGHT 9*90 //810
 
 #define WINDOW_CENTER_X	(WINDOW_WIDTH / 2)	// ウインドウの中心Ｘ座標
 #define WINDOW_CENTER_Y	(WINDOW_HEIGHT / 2)	// ウインドウの中心Ｙ座標

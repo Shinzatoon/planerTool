@@ -23,15 +23,19 @@ class FileLoader
 {
 private:
 	Object* obj;
-	int m_objNum;
-	bool m_initialized;
+	int _objNum;
+	bool _initialized;//‰Šú‰»‚³‚ê‚½
+	bool _untreated;//–¢ˆ—ó‘Ô
 public:
 	FileLoader();
 	void load(LPSTR fileName);//“Ç‚İ‚İŠÖ”
 	void release();
 	Object* getObj() { return obj; };
-	int objNum() { return m_objNum; }
-	bool initialized() { return m_initialized; };
+	int objNum() { return _objNum; }
+	bool initialized() { return _initialized; }
+	bool untreated() { return _untreated; }//–¢ˆ—ó‘Ô
+	void processed() { _untreated = false; }
+
 };
 
 FileLoader* getFileLoader();

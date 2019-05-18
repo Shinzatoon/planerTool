@@ -10,60 +10,102 @@
 #include "cursor.h"
 
 Image back;
-Image back1;
-Image back2;
-Image back3;	//後で配列にしよう！！
+Icon icon[ICON_NUM];
 
-Icon playerIcon;
 
-Icon exportButton;
+
 Cursor cursor;
 Dlist objList;
 bool checkin = false;
 
-VECTOR2 cursorMoveAmount;//移動量 
-VECTOR2 recordCursor; //クリックしたときのマウス座標
-VECTOR2 recordIcon; //クリックしたときのアイコン座標
-
-bool onDrag = false;//ドラッグされているか
-bool onDrag2 = false;//ドラッグされているか
-
-bool oncursor(Image);
-
 void initializeTitle() {
 	InitImage(&back, getTexture(textureLoaderNS::BACK_GROUND), 0, 0,WINDOW_WIDTH, WINDOW_HEIGHT);
-	InitImage(&back1, getTexture(textureLoaderNS::ENEMY_ICON), 100, 160, 100, 100);
-	InitImage(&back2, getTexture(textureLoaderNS::PLAYER_ICON), 100, 320, 100, 100);
-	InitImage(&back3, getTexture(textureLoaderNS::STAR_ICON), 100, 480, 100, 100);
 	
-	playerIcon.initialize(PLAYER_ICON);
-
+	//アイコンの初期化
+	for (int i = 0; i < ICON_NUM;i++)
+	{
+		icon[i].initialize(i);
+	}
 	objList.Initialize();//リストの初期化
-
-	exportButton.initialize(EXPORT_ICON);
 };
+
 
 void updateTitle() {
 
-	cursor.update();//カーソルの更新
-
-	exportButton.update();
-	
-	bool onCreateIcon = false;
 	Icon obj;//新たに作成するオブジェクトの初期化用
+	if (getFileLoader()->untreated())
+	{//ファイルが読み込まれて、未処理状態になった場合
+		objList.Clear();//全ノードを削除
+		int objNum = getFileLoader()->objNum();
+		Object* o = getFileLoader()->getObj();
+		for (int i = 0; i < objNum; i++)
+		{//読み込んだファイルの情報に従って、リストを追加していく。
+			obj.initialize(
+				o[i].objType,
+				VECTOR2(
+					o[i].position.x+icon[EDITER_AREA].getLeft(),
+					o[i].position.y+icon[EDITER_AREA].getTop()),
+				o[i].id,
+				o[i].rotation
+			);//新たに作成するオブジェクトの初期化
+			objList.InsertAfter(objList.crnt, &obj);//オブジェクトの生成(リストへ登録)
+		}
+		getFileLoader()->processed();//処理を完了状態にする
+	}
+
+	cursor.update();//カーソルの更新
+	for (int i = 0; i < ICON_NUM; i++) {
+		icon[i].update();//アイコンの更新
+	}
+	
 	if (getMouseLTrigger())
 	{// 左クリックされた時
-		if (playerIcon.onCursor(cursor.position))
-		{// カーソルがプレイヤーアイコン上にあった場合
-			obj.initialize(PLAYER_ICON,playerIcon.getPos());//新たに作成するオブジェクトの初期化
-			objList.InsertAfter(objList.crnt, &obj);//オブジェクトの生成(リストへ登録)
-			onCreateIcon = true;
-			cursor.setTarget(&objList.crnt->data);//カーソルの選択対象としてセットする。
+		if (cursor.onCreateIcon==false)
+		for (int i = 0; i < ICON_NUM; i++)
+		{
+			if (!icon[i].canDuplicate)continue;//複製可能アイコンの場合
+			int id;//固有番号の設定
+			if (objList.IsEmpty()) {id = 0;}
+			else {//objList.Search()//IDの最大値を探索する。
+				//とりあえずは、着目ノードのIDの次の番号を代入
+				id = objList.crnt->prev->data.getID() + 1;}
+			if (icon[i].onCursor())
+			{// カーソルがプレイヤーアイコン上にあった場合
+				obj.initialize(i,
+					icon[i].getPos(),
+					id, 
+					0
+				);//新たに作成するオブジェクトの初期化
+				objList.InsertAfter(objList.crnt, &obj);//オブジェクトの生成(リストへ登録)
+				cursor.onCreateIcon = true;
+				cursor.setTarget(&objList.crnt->data);//カーソルの選択対象としてセットする。
+			}
 		}
-		
-		//リストの全走査
+	}
+
+	objList.update();
 
 
+
+	if (getMouseLRelease())
+	{//左クリックが離されたとき
+		if (cursor.onCreateIcon)//オブジェクトを生成していた場合
+		{
+			if (cursor.target == NULL)
+			{//カーソルのターゲットがNULLでない場合
+				objList.RemoveCurrent();
+			}
+			else {//カーソルのターゲットがNULLでない場合
+				if (icon[EDITER_AREA].getLeft() > cursor.target->getLeft() ||
+					icon[EDITER_AREA].getRight() < cursor.target->getRight() ||
+					icon[EDITER_AREA].getTop() > cursor.target->getTop() ||
+					icon[EDITER_AREA].getBottom() < cursor.target->getBottom())
+				{//生成したオブジェクトがエリア内でない場合
+					objList.RemoveCurrent();
+				}
+			}
+			cursor.onCreateIcon = false;//生成状態を解除
+		}
 	}
 
 
@@ -73,17 +115,12 @@ void updateTitle() {
 };
 
 void drawTitle() {
-	
-	DrawImage(&back);
-	DrawImage(&back1);
-	DrawImage(&back2);
-	DrawImage(&back3);
 
-	playerIcon.draw();
+	DrawImage(&back);//背景の描画
+	for (int i = 0; i < ICON_NUM; i++) {
+		icon[i].draw();
+	}
 	objList.Print();//リスト内を全て描画する
-
-	exportButton.draw();
-
 };
 
 void printTitle() {
@@ -92,38 +129,38 @@ void printTitle() {
 	printTextDX(getDebugFont(), "mouseX:", 1000, 0, getMouseX());
 	printTextDX(getDebugFont(), "mouseY:", 1000, 20, getMouseY());
 
-
 	//プロパティの表示
-	if (getMouseLButton())
+	if (cursor.target == NULL) {
+		printTextDX(getDebugFont(), "■ オブジェクトを選択してください。", 1230, 60);
+		printTextDX(getDebugFont(), "高さ:", 1300, 80);
+		printTextDX(getDebugFont(), "幅　:", 1300, 100);
+	}
+	else if(cursor.target->onCursor())
 	{
-		if (oncursor(back2))
+		printTextDX(getDebugFont(), "■ プレイヤー", 1230, 60);
+		printTextDX(getDebugFont(), "高さ:", 1300, 80, cursor.target->getHeight());
+		printTextDX(getDebugFont(), "幅　:", 1300, 100, cursor.target->getWidth());
+	}
+
+	//マウス左ボタントリガー
+	if (getMouseLTrigger()){
+		printTextDX(getDebugFont(), "MouseLButton[Trigger]:true", 500, 0);
+	}else{
+		printTextDX(getDebugFont(), "MouseLButton[Trigger]:false", 500, 0);}
+	//マウス左ボタンリリース
+	if (getMouseLRelease()){
+		printTextDX(getDebugFont(), "MouseLButton[Release]:true", 500, 20);
+	}else{
+		printTextDX(getDebugFont(), "MouseLButton[Release]:false", 500, 20);}
+
+
+
+	for (int i = 0; i < ICON_NUM; i++)
+	{
+		if (icon[i].onCursor())
 		{
-			printTextDX(getDebugFont(), "■ プレイヤー", 1230, 60);
-			printTextDX(getDebugFont(), "高さ:", 1300, 80, back2.height);
-			printTextDX(getDebugFont(), "幅　:", 1300, 100, back2.width);
-			if (!onDrag)
-			{
-			}
+			printTextDX(getDebugFont(), "挿入った", 200, 0);
 		}
-	}
-
-
-	if (getMouseLButton())
-	{
-		printTextDX(getDebugFont(), "mouseX:", 500, 0, getMouseRawX());
-		printTextDX(getDebugFont(), "mouseY:", 500, 20, getMouseRawY());
-	}
-	if (oncursor(back1))
-	{
-		printTextDX(getDebugFont(), "挿入った", 500, 0);
-	}	
-	if (oncursor(back2))
-	{
-		printTextDX(getDebugFont(), "挿入った", 500, 0);
-	}
-	if (oncursor(back3))
-	{
-		printTextDX(getDebugFont(), "挿入った", 500, 0);
 	}
 
 	//ドラッグしたファイル内情報を表示
@@ -147,68 +184,8 @@ void printTitle() {
 	}
 };
 
-bool oncursor(Image img)
-{
-	if (img.position.x < getMouseX() && img.position.x + img.height > getMouseX() &&
-		img.position.y < getMouseY() && img.position.y + img.width > getMouseY())
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-bool on(Image img)
-{
-	if (img.position.x < getMouseX() && img.position.x + img.height > getMouseX() &&
-		img.position.y < getMouseY() && img.position.y + img.width > getMouseY())
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-
-Image a[1];
-Image *Target;
-
-void moveControl(Image *img)
-{
-	if (getMouseLButton())
-	{//左クリックが押されているとき
-		if (oncursor(*img))
-		{//カーソルがアイコン上にあるとき
-			if (!onDrag)
-			{//何かをドラッグしていなければ
-				//そのアイコンをドラッグする
-				Target = img;
-
-				recordCursor = VECTOR2((float)getMouseX(), (float)getMouseY());//クリックした瞬間のカーソル位置を保存
-				recordIcon = (VECTOR2)Target->position;//クリックした瞬間のアイコン位置を保存
-				onDrag = true;//ドラッグ状態にする
-			}
-		}
-	}
-	else if (onDrag)
-	{//左クリックが離されていて、ドラッグ状態であったならば
-		onDrag = false;//ドラッグ状態をOFFにする
-		Target = NULL;
-	}
-
-	if (onDrag && Target != NULL)
-	{//ドラッグ状態のとき移動
-		cursorMoveAmount = VECTOR2((float)getMouseX(), (float)getMouseY()) - recordCursor;//カーソル移動量
-		VECTOR2 virtualPos = recordIcon + cursorMoveAmount;//仮の表示位置
-		setPosition(Target, virtualPos.x, virtualPos.y);
-	}
-
-}
-
 void unInitializeTitle() 
 {
+	UninitImage(&back);
 	objList.Terminate();
 };

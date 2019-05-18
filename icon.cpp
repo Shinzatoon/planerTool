@@ -1,51 +1,124 @@
 #include "icon.h"
 #include "textureLoader.h"
 #include "input.h"
+using namespace iconNS;
 Icon::Icon()
-{	
-	m_onCursor = false;
-	m_shrinked = false;
+{
+	shrinked = false;
 }	
 Icon::~Icon()
 {
-
+	UninitImage(&image);
 }
 
-void Icon::initialize(int iconType, VECTOR2 pos)
+void Icon::initialize(int _iconType, VECTOR2 pos, int id, float rotation)
 {
-	initialize(iconType);
-	setPosition(&m_image, pos.x, pos.y);
-	setPosition(&m_selectFrame, pos.x, pos.y);
-}
-void Icon::initialize(int iconType)
-{
-	switch (iconType)
+	initialize(_iconType);
+	setPosition(&image, pos.x, pos.y);
+	setAngle(&image, rotation);
+
+	if (enableFrame)
 	{
-	case EXPORT_ICON:
-		defaultPos = VECTOR2(10, 10);
-		defaultSize = VECTOR2(192 / 2, 64 / 2);
-		InitImage(&m_selectFrame, getTexture(textureLoaderNS::BUTTON_FRAME), defaultPos.x, defaultPos.y, defaultSize.x, defaultSize.y);//[初期化]
-		InitImage(&m_image, getTexture(textureLoaderNS::EXPORT_ICON), defaultPos.x, defaultPos.y, defaultSize.x, defaultSize.y);//[初期化]
+		setPosition(&selectFrame, pos.x, pos.y);
+		setAngle(&selectFrame, rotation);
+	}
+}
+void Icon::initialize(int _iconType)
+{
+	iconType = _iconType;
+	VECTOR2 size;
+	VECTOR2 pos;
+	LPDIRECT3DTEXTURE9* texture = NULL;
+	int initializeMethod = DEFAULT;
+	enableFrame = true;
+	canDuplicate = true;
+	switch (_iconType)
+	{
+	case EDITER_AREA:
+		canDuplicate = false;
+		texture = NULL;
+		initializeMethod = COLOR;
+		enableFrame = false;
 		break;
-	case PLAYER_ICON:
-		defaultPos = VECTOR2(10, 200);
-		defaultSize = VECTOR2(64, 64);
-		InitImage(&m_selectFrame, getTexture(textureLoaderNS::BUTTON_FRAME), defaultPos.x, defaultPos.y, defaultSize.x, defaultSize.y);//[初期化]
-		InitImage(&m_image, getTexture(textureLoaderNS::PLAYER_ICON), defaultPos.x, defaultPos.y, defaultSize.x, defaultSize.y);//[初期化]
+	case EXPORT:
+		canDuplicate = false;
+		texture = getTexture(textureLoaderNS::EXPORT_ICON);
+		setTextureList(&image, 2, *texture, *getTexture(textureLoaderNS::STAR_ICON));
+		enableFrame = false;
 		break;
+	case PLAYER:
+		texture = getTexture(textureLoaderNS::PLAYER_ICON);
+		break;
+	case ENEMY:
+		texture = getTexture(textureLoaderNS::ENEMY_ICON);
+		break;
+	case STAR:
+		texture = getTexture(textureLoaderNS::STAR_ICON);
+		break;
+	default:
+		canDuplicate = false;//複製不可
+		texture = NULL;//テクスチャなし
+		initializeMethod = COLOR;//初期化モードカラー
+		enableFrame = false;//フレーム無効化
+		break;
+	}
+	//[アイコン表示画像本体の初期化]
+	switch (initializeMethod)
+	{
+	case DEFAULT:
+		InitImage(
+		&image,
+		texture,
+		PARAMETER[iconType].x,
+		PARAMETER[iconType].y,
+		PARAMETER[iconType].width,
+		PARAMETER[iconType].height);
+		break;
+	case ANIME:
+		break;
+	case COLOR:
+		InitImage(
+		&image,
+		texture,
+		PARAMETER[iconType].x,
+		PARAMETER[iconType].y,
+		PARAMETER[iconType].width,
+		PARAMETER[iconType].height,
+		PARAMETER[iconType].color);
+		break;
+	}
+	
+	//[選択表記フレーム画像の初期化]
+	if (enableFrame){
+		InitImage(&selectFrame,
+			getTexture(textureLoaderNS::BUTTON_FRAME),
+			PARAMETER[iconType].x,
+			PARAMETER[iconType].y,
+			PARAMETER[iconType].width,
+			PARAMETER[iconType].height
+		);
 	}
 }
 
 void Icon::draw()
 {	
-	DrawImage(&m_image);
-	DrawImage(&m_selectFrame);
+	DrawImage(&image);
+	if (enableFrame) {
+		DrawImage(&selectFrame);
+	}
 }	
 	
 void Icon::update()
 {	
-	VECTOR2 mousePos((float)getMouseX(), (float)getMouseY());
-	if (onCursor(mousePos))
+	if (onCursor())
+	{
+	}
+	if(iconType == EXPORT)buttonUpdate();
+}	
+
+void Icon::buttonUpdate()
+{
+	if (onCursor())
 	{//書き出しボタンにカーソルがあった場合
 		if (getMouseLButton())
 		{//左クリック時
@@ -55,43 +128,38 @@ void Icon::update()
 			reSize();//元の大きさに戻す
 		}
 	}
-	else 
+	else
 	{//カーソルがボタン外の場合
 		reSize();//元の大きさに戻す
 	}
-
-}	
+}
 
 void Icon::shrink()
 {//ボタン縮小
-	if (m_shrinked)return;
-	float rate = 0.9f;
-	setPosition(&m_image, m_image.position.x, m_image.position.y);
-	setSize(&m_image, m_image.width*rate, m_image.height*rate);
-	setSize(&m_selectFrame, m_selectFrame.width*rate, m_selectFrame.height*rate);
-	m_shrinked = true;
+	if (shrinked)return;
+	changeTexture(&image, 1);//1番に切替
+	shrinked = true;
 }
 
 void Icon::reSize()
 {//元の大きさに戻す
-	if (!m_shrinked)return;
-	setSize(&m_image, defaultSize.x, defaultSize.y);
-	setSize(&m_selectFrame, defaultSize.x, defaultSize.y);
-	m_shrinked = false;
+	if (!shrinked)return;
+	changeTexture(&image, 0);//0番テクスチャに切替
+	shrinked = false;
 }
 
-
-bool Icon::onCursor(VECTOR2 mousePos)
+bool Icon::onCursor()
 {		
-	if (m_image.position.x < mousePos.x && m_image.position.x + m_image.width > mousePos.x &&
-		m_image.position.y < mousePos.y && m_image.position.y + m_image.height > mousePos.y)
+	VECTOR2 mousePos((float)getMouseX(), (float)getMouseY());
+	if (image.position.x < mousePos.x && image.position.x + image.width > mousePos.x &&
+		image.position.y < mousePos.y && image.position.y + image.height > mousePos.y)
 	{	
-		m_selectFrame.renderFlag = true;
+		selectFrame.renderFlag = true;
 		return true;
 	}	
 	else
 	{	
-		m_selectFrame.renderFlag = false;
+		selectFrame.renderFlag = false;
 		return false;
 	}	
 }	
