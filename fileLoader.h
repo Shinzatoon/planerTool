@@ -12,6 +12,8 @@ enum OBJ_TYPE
 	T_STAR,
 };
 
+#define DIRECTORY_PASS "stage/"
+
 struct Object {
 	int id;
 	int objType;
@@ -22,6 +24,7 @@ struct Object {
 class FileLoader
 {
 private:
+	char currentFile[1024];
 	Object* obj;
 	int _objNum;
 	bool _initialized;//‰Šú‰»‚³‚ê‚½
@@ -35,7 +38,7 @@ public:
 	bool initialized() { return _initialized; }
 	bool untreated() { return _untreated; }//–¢ˆ—ó‘Ô
 	void processed() { _untreated = false; }
-
+	char* getCurrentFile() { return currentFile; }
 };
 
 FileLoader* getFileLoader();

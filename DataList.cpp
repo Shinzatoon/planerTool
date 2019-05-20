@@ -63,6 +63,32 @@ Dnode* Dlist::Search(const Icon* x, int compare(const Icon* x, const Icon* y))
 	return NULL;				// 探索失敗
 };
 
+//着目ノードを先頭ヘッダにする
+void Dlist::setHead()
+{
+	if (IsEmpty() || crnt == head->next)return;	// 既に先頭ヘッダである又は空
+	
+	crnt = head->next;//先頭ヘッダに合わせる
+}
+
+// リストのサイズを戻す
+int Dlist::size()
+{
+	int listSize = 0;
+	if (IsEmpty()) {
+		return listSize;
+	}
+	else {
+		//全オブジェクトの走査
+		Dnode* ptr = head->next;//ポインタを先頭ヘッダに合わせる。
+		while (ptr != head) {
+			listSize++;
+			ptr = ptr->next;	// 後続ノードに着目	
+		}
+	}
+	return listSize;
+}
+
 // 全ノードのデータをリスト順に更新
 void Dlist::update()
 {

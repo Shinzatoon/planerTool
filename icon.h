@@ -34,7 +34,7 @@ private:
 	Image image;
 	Image selectFrame;
 	int iconType;
-	bool shrinked;//拡大されている
+	bool pressed;//押下されている
 	bool enableFrame;//フレーム有効
 public:
 	bool canDuplicate;//複製可能
@@ -47,10 +47,10 @@ public:
 	void draw();
 
 	void update();
-	void buttonUpdate();
+	bool exportUpdate();
 	bool onCursor();
-	void shrink();//縮小
-	void reSize();//元の大きさに戻す
+	void makePressed();//押下状態にする
+	void makeRelease();//押上状態にする
 	void setPos(VECTOR2 pos) {
 		setPosition(&image, pos.x, pos.y);
 		if(enableFrame)setPosition(&selectFrame, pos.x, pos.y);
@@ -61,7 +61,10 @@ public:
 	float getRight() { return image.position.x+image.width; }
 	float getTop() { return image.position.y; }
 	float getBottom() { return image.position.y+image.height; }
+	float getAngle() { return image.angle; }
 	int getID() { return id; }
+	int getType() { return iconType; }
+
 
 	VECTOR2 getPos() { return VECTOR2(image.position.x, image.position.y); };
 

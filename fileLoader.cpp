@@ -1,17 +1,45 @@
 #include "fileLoader.h"
+#include "main.h"
 
 FileLoader fileLoader;
 
 FileLoader::FileLoader()
 {
+	_snprintf_s(currentFile,1024,"%s","defaultSaveData");
 	_objNum = 0;
 	_initialized = false;
 }
 
 void FileLoader::load(LPSTR fileName)
 {
+	//文字情報の解析
+	char* p;
+	char* txt;
+	char record[255];
+	p = strstr(fileName,"stage\\");//「stage/」文字位置を検索
+	txt = strstr(fileName,".txt");//「stage/」文字位置を検索
+	int i = 0;
+	while (p != txt)
+	{
+		record[i] = *p;
+		i++; p++;
+	}
+	record[i] = '\0';
+	_snprintf_s(record, 255, "%s%s", record, ".txt");
+
+	const int BUF_SIZE = 1024;
+	char buffer[BUF_SIZE];
+	int onButton;
+	_snprintf_s(buffer, BUF_SIZE, "%s%s%s",
+		"ファイルパス[",
+		record,
+		"]を読み込みます。よろしいですか？");
+	onButton = MessageBox(getHWnd(), buffer, "ロードファイルの確認", MB_YESNO | MB_ICONWARNING);
+	if (onButton == IDNO)return;
+
+	_snprintf_s(currentFile,1024,"%s",record);
 	FILE* fp = NULL;
-	fopen_s(&fp, fileName, "rt");
+	fopen_s(&fp, currentFile, "rt");
 
 	char key[255] = { 0 };
 

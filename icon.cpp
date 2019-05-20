@@ -1,22 +1,25 @@
 #include "icon.h"
 #include "textureLoader.h"
 #include "input.h"
+#include "fileLoader.h"
+#include "exporter.h"
+
 using namespace iconNS;
 Icon::Icon()
 {
-	shrinked = false;
+	pressed = false;
 }	
 Icon::~Icon()
 {
 	UninitImage(&image);
 }
 
-void Icon::initialize(int _iconType, VECTOR2 pos, int id, float rotation)
+void Icon::initialize(int _iconType, VECTOR2 pos, int _id, float rotation)
 {
 	initialize(_iconType);
 	setPosition(&image, pos.x, pos.y);
 	setAngle(&image, rotation);
-
+	id = _id;
 	if (enableFrame)
 	{
 		setPosition(&selectFrame, pos.x, pos.y);
@@ -113,39 +116,54 @@ void Icon::update()
 	if (onCursor())
 	{
 	}
-	if(iconType == EXPORT)buttonUpdate();
 }	
 
-void Icon::buttonUpdate()
+bool Icon::exportUpdate()
 {
+	if (iconType != EXPORT)return false;
 	if (onCursor())
 	{//書き出しボタンにカーソルがあった場合
 		if (getMouseLButton())
-		{//左クリック時
-			shrink();//拡大状態にする
+		{//左クリック中
+			makePressed();//押下状態にする
 		}
-		else {
-			reSize();//元の大きさに戻す
+		if(getMouseLRelease())
+		{
+			makeRelease();//押上状態にする
+			const int BUF_SIZE = 1024;
+			char buffer[BUF_SIZE];
+			int onButton;
+			_snprintf_s(buffer, BUF_SIZE, "%s%s%s",
+				"ファイルパス[",
+				getFileLoader()->getCurrentFile(),
+				"]として書き出しを行いますか？");
+			onButton = MessageBox(
+				getHWnd(),
+				buffer,
+				"エクスポート",
+				MB_YESNO| MB_ICONWARNING);
+			if (onButton == IDYES) return true;
 		}
 	}
 	else
 	{//カーソルがボタン外の場合
-		reSize();//元の大きさに戻す
+		makeRelease();//押上状態にする
 	}
+	return false;
 }
 
-void Icon::shrink()
+void Icon::makePressed()
 {//ボタン縮小
-	if (shrinked)return;
+	if (pressed)return;
 	changeTexture(&image, 1);//1番に切替
-	shrinked = true;
+	pressed = true;
 }
 
-void Icon::reSize()
-{//元の大きさに戻す
-	if (!shrinked)return;
+void Icon::makeRelease()
+{//押上状態にする
+	if (!pressed)return;
 	changeTexture(&image, 0);//0番テクスチャに切替
-	shrinked = false;
+	pressed = false;
 }
 
 bool Icon::onCursor()

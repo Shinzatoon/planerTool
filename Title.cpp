@@ -58,6 +58,11 @@ void updateTitle() {
 		icon[i].update();//アイコンの更新
 	}
 	
+	if(icon[EXPORT].exportUpdate())
+	{
+		exporter()->exportFile(getFileLoader()->getCurrentFile(),objList);
+	}
+
 	if (getMouseLTrigger())
 	{// 左クリックされた時
 		if (cursor.onCreateIcon==false)
@@ -76,7 +81,7 @@ void updateTitle() {
 					id, 
 					0
 				);//新たに作成するオブジェクトの初期化
-				objList.InsertAfter(objList.crnt, &obj);//オブジェクトの生成(リストへ登録)
+				objList.InsertAfter(objList.head, &obj);//オブジェクトの生成(リストへ登録)
 				cursor.onCreateIcon = true;
 				cursor.setTarget(&objList.crnt->data);//カーソルの選択対象としてセットする。
 			}
