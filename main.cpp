@@ -67,6 +67,9 @@ INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR szStr, INT nCmdSh
 	ZeroMemory(&msg, sizeof(msg));
 	while (msg.message != WM_QUIT)
 	{
+		//２度ファイルをドラッグして読み込もうとすると、
+		//ここで、エラー報告が出た。
+		//デバッグの必要あり。
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{// メッセージがある場合
 			TranslateMessage(&msg);// DispatchMessageと対に使用する
@@ -74,8 +77,6 @@ INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR szStr, INT nCmdSh
 		}
 		else
 		{// メッセージがない場合
-		 
-
 			// アプリケーション処理
 			update();
 			RenderDX9();

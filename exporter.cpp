@@ -15,7 +15,7 @@ void Exporter::exportFile(LPSTR fileName,Dlist dataList)
 	fopen_s(&fp, fileName, "wt");
 
 	//オブジェクトの数を書き出す
-	fprintf_s(fp, "objNum %d\n", dataList.size());
+	fprintf_s(fp, "objnum %d\n", dataList.size());
 
 	bool complete = false;
 	dataList.setHead();//リストを先頭にする

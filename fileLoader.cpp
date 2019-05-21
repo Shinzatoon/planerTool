@@ -5,7 +5,13 @@ FileLoader fileLoader;
 
 FileLoader::FileLoader()
 {
-	_snprintf_s(currentFile,1024,"%s","defaultSaveData");
+	// できれば、このファイル名をデフォルトとするのではなく、
+	// stageディレクトリを調べて、stage/stage[空き番].txtを設定したい
+	// 追加処理
+	// stageディレクトリ探査
+	// 空き番stage.txtテキストファイルへのパスの設定
+	_snprintf_s(currentFile,1024,"%s","stage/defaultSaveData.txt");
+
 	_objNum = 0;
 	_initialized = false;
 }
@@ -16,8 +22,13 @@ void FileLoader::load(LPSTR fileName)
 	char* p;
 	char* txt;
 	char record[255];
+	//下記２点が見つからなかったらエラー報告の上、読み込まない。
 	p = strstr(fileName,"stage\\");//「stage/」文字位置を検索
 	txt = strstr(fileName,".txt");//「stage/」文字位置を検索
+
+	//追加処理
+	//上記の結果からエラー報告をここに追加
+
 	int i = 0;
 	while (p != txt)
 	{
@@ -55,7 +66,7 @@ void FileLoader::load(LPSTR fileName)
 		//オブジェクト数を読み込む
 		if (strcmp(key, "objnum") == 0)
 		{
-			_objNum;
+			_objNum = 0;
 			fscanf_s(fp, "%d", &_objNum);
 			obj = new Object[_objNum];//オブジェクトを用意する。
 		}
@@ -84,6 +95,12 @@ void FileLoader::load(LPSTR fileName)
 void FileLoader::release()
 {
 	delete[] obj;
+	//バグ
+	//ファイルを読み込み、アプリケーションを閉じた時に出たバグ
+	//deleteで、メモリの解放処理を行ったが、何かが問題でエラーを吐く
+	//恐らく動的確保の繰り返しの中で、間違った確保をしている？
+	//動的確保の正しいやり方をもっと調べる必要ありnew,deleteで。
+	//エラー表記では、obj = new Objectでエラーが出ている模様
 }
 
 FileLoader* getFileLoader()
