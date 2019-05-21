@@ -8,11 +8,18 @@
 #include "exporter.h"
 #include "icon.h"
 #include "cursor.h"
+#include "inputDialog.h"
 
 Image back;
 Image back1;
 Image back2;
 Image back3;	//後で配列にしよう！！
+
+Image heightBox;
+Image widthBox;
+
+//高さの中身表示用
+Image heightProperty;
 
 Icon playerIcon;
 
@@ -21,12 +28,23 @@ Cursor cursor;
 Dlist objList;
 bool checkin = false;
 
+InputDialog propertyDialog;
+
 VECTOR2 cursorMoveAmount;//移動量 
 VECTOR2 recordCursor; //クリックしたときのマウス座標
 VECTOR2 recordIcon; //クリックしたときのアイコン座標
 
 bool onDrag = false;//ドラッグされているか
 bool onDrag2 = false;//ドラッグされているか
+
+bool doubleTrigger = false;//ダブルクリックフラグ
+
+bool propertyCheck1 = false; //プロパティをチェックできる状態か否か
+bool propertyCheck2= false;
+
+bool onPropertyInfo = false;
+
+bool displayInfo = false;
 
 bool oncursor(Image);
 
@@ -36,12 +54,25 @@ void initializeTitle() {
 	InitImage(&back2, getTexture(textureLoaderNS::PLAYER_ICON), 100, 320, 100, 100);
 	InitImage(&back3, getTexture(textureLoaderNS::STAR_ICON), 100, 480, 100, 100);
 	
+	InitImage(&heightBox, NULL, 1290, 81, 70, 22);
+	SetColorImage(&heightBox, D3DXCOLOR(colorNS::RED));
+
+	InitImage(&widthBox, NULL, 1290, 121, 70, 22);
+	SetColorImage(&widthBox, D3DXCOLOR(colorNS::BLUE));
+
+	InitImage(&heightProperty, NULL, WINDOW_WIDTH / 4, WINDOW_HEIGHT / 4, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 8);
+	SetColorImage(&heightProperty, D3DXCOLOR(colorNS::GRAY));
+
 	playerIcon.initialize(PLAYER_ICON);
 
 	objList.Initialize();//リストの初期化
 
 
 	exportButton.initialize(EXPORT_ICON);
+
+
+	///////
+	propertyDialog.initialize(getHWnd());
 };
 
 void updateTitle() {
@@ -66,6 +97,70 @@ void updateTitle() {
 		}
 	}
 
+	//プロパティの表示
+	if (getMouseLRelease())
+	{
+		if (doubleTrigger == false)
+		{
+			if (oncursor(back1))
+			{
+				doubleTrigger = true;
+			}
+			else
+			{
+				doubleTrigger = false;
+			}
+		}
+
+	}
+	if (doubleTrigger == true)
+	{
+		if (getMouseLTrigger())
+		{
+			if (oncursor(back1))
+			{
+				propertyCheck1 = true;
+			}
+			else
+			{
+				propertyCheck1 = false;
+				doubleTrigger = false;
+			}
+		}
+
+	}
+
+	if (getMouseLTrigger())
+	{
+		if (oncursor(back2))
+		{
+			propertyCheck2 = true;
+		}
+		else
+		{
+			propertyCheck2 = false;
+		}
+	}
+
+	//ダイアログ表示
+	/*propertyDialog.update();
+	if (getMouseLButton())
+	{
+		if (oncursor(heightBox))
+		{
+			propertyDialog.print("please InputText");
+		}
+	}*/
+
+
+	if (getMouseLButton())
+	{
+		if (oncursor(heightBox))
+		{
+			displayInfo = true;
+		}
+	}
+
 	//アイコンにカーソルを合わせる
 	//ホールド状態でなければ、
 	//アイコンの上でつかむ（クリック）→オブジェクト一つ生成
@@ -80,10 +175,21 @@ void drawTitle() {
 	DrawImage(&back2);
 	DrawImage(&back3);
 
+	DrawImage(&heightBox);
+	DrawImage(&widthBox);
+
+	//高さプロパティ表示
+	if (displayInfo == true)
+	{
+		DrawImage(&heightProperty);
+	}
+
 	playerIcon.draw();
 	objList.Print();//リスト内を全て描画する
 
 	exportButton.draw();
+
+	propertyDialog.draw();
 
 };
 
@@ -93,19 +199,26 @@ void printTitle() {
 	printTextDX(getDebugFont(), "mouseX:", 1000, 0, getMouseX());
 	printTextDX(getDebugFont(), "mouseY:", 1000, 20, getMouseY());
 
-
-	//プロパティの表示
-	if (getMouseLButton())
+	
+	if (propertyCheck1 == true)
 	{
-		if (oncursor(back2))
-		{
-				printTextDX(getDebugFont(), "■ プレイヤー", 1230, 60);
-				printTextDX(getDebugFont(), "高さ:", 1300, 80, back2.height);
-				printTextDX(getDebugFont(), "幅　:", 1300, 100, back2.width);
-			if (!onDrag)
-			{
-			}
-		}
+		printTextDX(getDebugFont(), "■ エネミー", 1230, 60);
+		printTextDX(getDebugFont(), "高さ:", 1300, 80, back1.height);
+		printTextDX(getDebugFont(), "幅　:", 1300, 100, back1.width);
+	}
+
+	
+	if (propertyCheck2 == true)
+	{
+		printTextDX(getDebugFont(), "■ プレイヤー", 1230, 60);
+		printTextDX(getDebugFont(), "高さ:", 1250, 80, back2.height);
+		printTextDX(getDebugFont(), "幅　:", 1250, 120, back2.width);
+	}
+
+
+	if (displayInfo == true)
+	{
+		printTextDX(getDebugFont(), getTextIn(), WINDOW_WIDTH * 3 / 8, WINDOW_HEIGHT * 9 /32);
 	}
 
 
@@ -123,6 +236,14 @@ void printTitle() {
 		printTextDX(getDebugFont(), "挿入った", 500, 0);
 	}
 	if (oncursor(back3))
+	{
+		printTextDX(getDebugFont(), "挿入った", 500, 0);
+	}
+	if (oncursor(heightBox))
+	{
+		printTextDX(getDebugFont(), "挿入った", 500, 0);
+	}
+	if (oncursor(widthBox))
 	{
 		printTextDX(getDebugFont(), "挿入った", 500, 0);
 	}
@@ -150,8 +271,8 @@ void printTitle() {
 
 bool oncursor(Image img)
 {
-	if (img.position.x < getMouseX() && img.position.x + img.height > getMouseX() &&
-		img.position.y < getMouseY() && img.position.y + img.width > getMouseY())
+	if (img.position.x < getMouseX() && img.position.x + img.width > getMouseX() &&
+		img.position.y < getMouseY() && img.position.y + img.height > getMouseY())
 	{
 		return true;
 	}
@@ -172,6 +293,7 @@ bool on(Image img)
 		return false;
 	}
 }
+
 
 
 Image a[1];
@@ -211,65 +333,9 @@ void moveControl(Image *img)
 
 }
 
-/*ゲーム画面の移動
-void movePointofView(Image *img)
-{
-	if (getMouseLButton())
-	{//左クリックが押されているとき
-		if (!oncursor(*img)&&!)
-		{//カーソルがアイコン上にあるとき
-			if (!onDrag)
-			{//何かをドラッグしていなければ
-				//そのアイコンをドラッグする
-				Target = img;
-
-				recordCursor = VECTOR2((float)getMouseX(), (float)getMouseY());//クリックした瞬間のカーソル位置を保存
-				recordIcon = (VECTOR2)Target->position;//クリックした瞬間のアイコン位置を保存
-				onDrag = true;//ドラッグ状態にする
-			}
-		}
-		//setPosition(&back1, back1.position.x += (float)getMouseRawX(), back1.position.y += (float)getMouseRawY());
-		//setPosition(&back1, (float)getMouseRawX(), (float)getMouseRawY());
-	}
-	else if (onDrag)
-	{//左クリックが離されていて、ドラッグ状態であったならば
-		onDrag = false;//ドラッグ状態をOFFにする
-		Target = NULL;
-	}
-
-	if (onDrag && Target != NULL)
-	{//ドラッグ状態のとき移動
-		cursorMoveAmount = VECTOR2(getMouseX(), getMouseY()) - recordCursor;//カーソル移動量
-		VECTOR2 virtualPos = recordIcon + cursorMoveAmount;//仮の表示位置
-		setPosition(Target, virtualPos.x, virtualPos.y);
-	}
-}
-
-*/
-
-
-////mallocサンプル
-//int main()
-//{
-//	int i;
-//	int *heep;
-//	heep = (int*)malloc(sizeof(int) * 10);
-//
-//	if (heep == NULL)
-//		exit(0);
-//
-//	for (i = 0; i < 10; i++)
-//	{
-//		heep[i] = i;
-//	}
-//	printf("%d\n", heep[5]);
-//
-//	free(heep);
-//
-//	return 0;
-//}
 
 void unInitializeTitle() 
 {
 	objList.Terminate();
 };
+ 

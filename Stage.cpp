@@ -6,6 +6,9 @@
 
 MessageDialog mDialog;
 InputDialog inDialog;
+int i = 100;
+const int BUF_SIZE = 255;
+static char buffer[BUF_SIZE];
 
 void initializeStage() {
 	inDialog.initialize(getHWnd());
@@ -26,7 +29,12 @@ void drawStage() {
 };
 
 void printStage() {
-	printTextDX(getDebugFont(), "Stage", 0, 0);
+	//printTextDX(getDebugFont(), "Stage", 0, 0);
+
+	/*_snprintf_s(buffer, BUF_SIZE, "%d", i);
+	printTextDX(getDebugFont(), buffer, 0, 0);*/
+	printTextDX(getDebugFont(), getTextIn(), 0, 0);
+	
 	printTextDX(getDebugFont(), "マウス中ボタンを押下で入力ダイアログボックスを表示する", 500, 30);
 	printTextDX(getDebugFont(), "mouseX:", 1000, 0, getMouseX());
 	printTextDX(getDebugFont(), "mouseY:", 1000, 30, getMouseY());

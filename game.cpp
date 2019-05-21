@@ -57,7 +57,7 @@ void unInitializeGame() {
 
 void changeScene()
 {
-	if(GetKeyboardTrigger(DIK_RETURN))
+	if(GetKeyboardTrigger(DIK_SPACE))
 	{
 		scene++;
 		if (scene >= SCENE_NUM)

@@ -4,7 +4,7 @@ void InitImage(Image* image, LPDIRECT3DTEXTURE9* texture,
 	float x, float y, float width, float height)
 {
 	LPDIRECT3DDEVICE9 pDevice = getDevice();
-	image->g_pD3DTexture = *texture;
+	if(texture != NULL)image->g_pD3DTexture = *texture;
 	image->position = D3DXVECTOR3(x, y, 0.0f);
 	image->width = width;
 	image->height = height;
