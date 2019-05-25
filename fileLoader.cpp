@@ -46,7 +46,7 @@ void FileLoader::load(LPSTR fileName)
 		record,
 		"]を読み込みます。よろしいですか？");
 	onButton = MessageBox(getHWnd(), buffer, "ロードファイルの確認", MB_YESNO | MB_ICONWARNING);
-	if (onButton == IDNO)return;
+	if(onButton == IDNO)return;
 
 	_snprintf_s(currentFile,1024,"%s",record);
 	FILE* fp = NULL;
@@ -59,12 +59,12 @@ void FileLoader::load(LPSTR fileName)
 		delete[] obj;
 	}
 
-	while (!feof(fp))
+	while (!feof(fp) || strcmp(key,"num") == 0)
 	{
 		//キーワード読み込み
 		fscanf_s(fp, "%s ", key, sizeof(key));
 		//オブジェクト数を読み込む
-		if (strcmp(key, "objnum") == 0)
+		if (strcmp(key, "num") == 0)
 		{
 			_objNum = 0;
 			fscanf_s(fp, "%d", &_objNum);
@@ -75,6 +75,7 @@ void FileLoader::load(LPSTR fileName)
 	fseek(fp, SEEK_SET, 0);//ファイルシーク位置を先頭にリセット
 	Object o;//格納用
 	int count = 0;
+	
 	while (!feof(fp))
 	{
 		//キーワード読み込み

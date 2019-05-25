@@ -53,6 +53,8 @@ void updateTitle() {
 		getFileLoader()->processed();//処理を完了状態にする
 	}
 
+	
+
 	cursor.update();//カーソルの更新
 	for (int i = 0; i < ICON_NUM; i++) {
 		icon[i].update();//アイコンの更新
@@ -88,10 +90,6 @@ void updateTitle() {
 		}
 	}
 
-	objList.update();
-
-
-
 	if (getMouseLRelease())
 	{//左クリックが離されたとき
 		if (cursor.onCreateIcon)//オブジェクトを生成していた場合
@@ -113,6 +111,60 @@ void updateTitle() {
 		}
 	}
 
+	//選択機能(移動)
+	if (getMouseLTrigger())
+	{
+		bool onSelect = false;//何かを選択したら
+		objList.setHead();//リストの先頭に着目ノードを合わせる
+		while (!objList.IsLast()&&!onSelect)
+		{//リストの最後になるまで繰り返す
+			if (objList.crnt->data.onCursor())
+			{//現在の着目ノードのデータがカーソルの上かどうか
+				//着目ノードを選択
+				cursor.setTarget(&objList.crnt->data);//カーソルの選択対象としてセットする。
+				onSelect = true;
+			}
+			objList.Next();
+		}
+		//最後のノードを削除可能か確認する
+		if (objList.crnt->data.onCursor() && !onSelect)
+		{//データがカーソルの上かどうか
+			cursor.setTarget(&objList.crnt->data);//カーソルの選択対象としてセットする。
+			onSelect = true;
+		}
+	}
+	
+	//削除機能
+	if (GetKeyboardRelease(DIK_D))
+	{
+		objList.setHead();//リストの先頭に着目ノードを合わせる
+		while (!objList.IsLast())
+		{//リストの最後になるまで繰り返す
+			if (objList.crnt->data.onCursor())
+			{//現在の着目ノードのデータがカーソルの上かどうか
+				if (&objList.crnt->data == cursor.target)
+				{//削除対象が選択対象であれば選択対象から外す
+					cursor.target = NULL;
+				}
+				objList.RemoveCurrent();//着目ノードを削除
+			}
+			objList.Next();
+		}
+		//最後のノードを削除可能か確認する
+		if (objList.crnt->data.onCursor())
+		{//データがカーソルの上かどうか
+			if (&objList.crnt->data == cursor.target)
+			{//削除対象が選択対象であれば選択対象から外す
+				cursor.target = NULL;
+			}
+			objList.RemoveCurrent();//着目ノードを削除
+		}
+	}
+
+
+	
+	
+	objList.update();
 
 	//選択対象オブジェクトがあればドラッグを行う。
 	cursor.drag();

@@ -21,6 +21,9 @@ public:
 	//リストは空か
 	int IsEmpty();
 
+	//着目ノードは最後のノードか
+	bool IsLast();
+
 	// リストを初期化
 	void Initialize();
 

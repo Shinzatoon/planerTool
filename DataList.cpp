@@ -138,6 +138,13 @@ void Dlist::PrintReverse()
 	}
 };
 
+bool Dlist::IsLast()
+{
+	if (IsEmpty() || crnt->next == head)
+		return true;	// 最後のノードである
+	return false;
+}
+
 // 着目ノードを一つ後方に進める
 int Dlist::Next()
 {

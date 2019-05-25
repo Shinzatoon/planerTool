@@ -132,7 +132,7 @@ bool Icon::exportUpdate()
 			makeRelease();//押上状態にする
 			const int BUF_SIZE = 1024;
 			char buffer[BUF_SIZE];
-			int onButton;
+			int onButton = NULL;
 			_snprintf_s(buffer, BUF_SIZE, "%s%s%s",
 				"ファイルパス[",
 				getFileLoader()->getCurrentFile(),
