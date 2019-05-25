@@ -112,7 +112,7 @@ void updateTitle() {
 	}
 
 	//選択機能(移動)
-	if (getMouseLTrigger())
+	if (getMouseLTrigger()&&cursor.target == NULL)
 	{
 		bool onSelect = false;//何かを選択したら
 		objList.setHead();//リストの先頭に着目ノードを合わせる

@@ -46,7 +46,7 @@ void Icon::initialize(int _iconType)
 	case EXPORT:
 		canDuplicate = false;
 		texture = getTexture(textureLoaderNS::EXPORT_ICON);
-		setTextureList(&image, 2, *texture, *getTexture(textureLoaderNS::STAR_ICON));
+		//setTextureList(&image, 2, *texture, *getTexture(textureLoaderNS::STAR_ICON));
 		enableFrame = false;
 		break;
 	case PLAYER:
@@ -155,14 +155,14 @@ bool Icon::exportUpdate()
 void Icon::makePressed()
 {//ボタン縮小
 	if (pressed)return;
-	changeTexture(&image, 1);//1番に切替
+	//changeTexture(&image, 1);//1番に切替
 	pressed = true;
 }
 
 void Icon::makeRelease()
 {//押上状態にする
 	if (!pressed)return;
-	changeTexture(&image, 0);//0番テクスチャに切替
+	//changeTexture(&image, 0);//0番テクスチャに切替
 	pressed = false;
 }
 
