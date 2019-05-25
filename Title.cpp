@@ -135,7 +135,7 @@ void updateTitle() {
 	}
 	
 	//削除機能
-	if (GetKeyboardRelease(DIK_D))
+	if (GetKeyboardRelease(DIK_D)&&cursor.target == NULL)
 	{
 		objList.setHead();//リストの先頭に着目ノードを合わせる
 		while (!objList.IsLast())
